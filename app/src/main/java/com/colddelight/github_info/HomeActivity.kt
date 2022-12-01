@@ -3,6 +3,7 @@ package com.colddelight.github_info
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -28,7 +29,7 @@ class HomeActivity : AppCompatActivity() {
         adapter =  RepoRecyclerAdapter().apply {
             setHasStableIds(true) // 리사이클러 뷰 업데이트 시 깜빡임 방지
         }
-        binding.rvRepo.adapter = adapter // 리사이클러 뷰 연결
+        binding.rvRepo.adapter = adapter
 
         lifecycleScope.launchWhenStarted {
             viewModel.user.collectLatest {

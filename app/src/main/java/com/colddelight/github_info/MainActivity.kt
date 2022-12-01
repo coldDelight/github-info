@@ -18,15 +18,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         authService = AuthorizationService(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
 
         binding.button.setOnClickListener {
             githubAuth()
@@ -35,14 +31,11 @@ class MainActivity : AppCompatActivity() {
 
     private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         if (it.resultCode == RESULT_OK) {
-            Log.e("TAG", "여기1: ", )
             val ex = AuthorizationException.fromIntent(it.data!!)
             val result = AuthorizationResponse.fromIntent(it.data!!)
-
             if (ex != null){
                 Log.e("Github Auth", "launcher: $ex")
             } else {
-                Log.e("TAG", "여기222: ", )
 
                 val secret = ClientSecretBasic(BuildConfig.GITHUB_CLIENT_SECRET)
                 val tokenRequest = result?.createTokenExchangeRequest()
@@ -51,12 +44,9 @@ class MainActivity : AppCompatActivity() {
                     if (exception != null){
                         Log.e("Github Auth", "launcher: ${exception.error}" )
                     } else {
-                        Log.e("TAG", "33333333: ", )
-
                         val token = res?.accessToken
                         viewModel.setToken(token!!)
 
-                        // Move to Github screen
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -66,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun githubAuth(){
-        Log.e("TAG", "https://github.com", )
         val redirectUri = Uri.parse("info-app://callback")
         val authorizeUri = Uri.parse("https://github.com/login/oauth/authorize")
         val tokenUri = Uri.parse("https://github.com/login/oauth/access_token")

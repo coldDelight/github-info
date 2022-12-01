@@ -1,7 +1,5 @@
 package com.colddelight.github_info.presentaion.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.colddelight.domain.model.DomainGithubUser
 import com.colddelight.domain.model.DomainRepo
@@ -18,7 +16,7 @@ class HomeViewModel @Inject constructor(
     private val infoUseCase: GetUserInfoUseCase,
     private val reposUseCase: GetUserReposUseCase
 
-): ViewModel(){
+): BaseViewModel(){
 
     private val _user: MutableStateFlow<DomainGithubUser?> = MutableStateFlow(null)
     val user: StateFlow<DomainGithubUser?> = _user
@@ -31,14 +29,14 @@ class HomeViewModel @Inject constructor(
         getUserRepos()
     }
 
-    private fun getUserInfo() {
+    private fun getUserInfo()  = viewModelScope.launch(exceptionHandler){
         viewModelScope.launch {
             val user = infoUseCase.invoke()
             _user.value = user
         }
     }
 
-    private fun getUserRepos() {
+    private fun getUserRepos() =  viewModelScope.launch(exceptionHandler) {
         viewModelScope.launch {
             val repos = reposUseCase.invoke()
             _repos.value = repos

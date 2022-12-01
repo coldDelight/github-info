@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun githubAuth(){
         val redirectUri = Uri.parse("info-app://callback")
         val authorizeUri = Uri.parse("https://github.com/login/oauth/authorize")

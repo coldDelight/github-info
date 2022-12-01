@@ -50,5 +50,23 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+
+        viewModel.state.observe(this){
+            when(it){
+                "1err" ->{
+                    Log.e("TAG", "err1", )
+                }
+                "2err" ->{
+                    Log.e("TAG", "err222", )
+                }
+                "3err" ->{
+                    Log.e("TAG", "err3333", )
+                }
+                "4err" ->{
+                    Log.e("TAG", "err4444", )
+                }
+
+            }
+        }
     }
 }

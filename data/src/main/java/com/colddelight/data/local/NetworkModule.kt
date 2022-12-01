@@ -1,0 +1,65 @@
+package com.colddelight.data.local
+
+import com.colddelight.data.BuildConfig
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+
+object NetworkModule {
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        prefs: Preferences
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(provideOkHttpClient(prefs))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        prefs: Preferences
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .addInterceptor(provideOkHttpLogging())
+            .addInterceptor{
+                val request = it.request()
+                    .newBuilder()
+                    .addHeader("authorization", ("token " + prefs.getGithubToken()) ?: "")
+                    .build()
+                // Response
+                val response = it.proceed(request)
+                response
+            }
+
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpLogging(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+    }
+
+}

@@ -27,45 +27,38 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         adapter =  RepoRecyclerAdapter().apply {
-            setHasStableIds(true) // 리사이클러 뷰 업데이트 시 깜빡임 방지
+            setHasStableIds(true)
         }
         binding.rvRepo.adapter = adapter
 
         lifecycleScope.launchWhenStarted {
-            viewModel.user.collectLatest {
+            viewModel.userState.collectLatest {
                 if (it != null) {
-                    binding.tvName.text = it.name
+                    binding.tvName.text = it.user?.name ?: ""
                     Glide.with(binding.root)
-                        .load(it.image)
+                        .load(it.user?.image)
                         .circleCrop()
                         .into(binding.ivImg)
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            viewModel.repos.collectLatest {
-                if (it != null) {
-                    adapter.setData(it)
+                    it.repo?.let { it1 -> adapter.setData(it1) }
                 }
             }
         }
 
         viewModel.state.observe(this){
-            when(it){
-                "1err" ->{
-                    Log.e("TAG", "err1", )
+            var msg=""
+            msg = when(it.second){
+                FetchState.BAD_INTERNET->{
+                    "소켓 오류입니다."
                 }
-                "2err" ->{
-                    Log.e("TAG", "err222", )
+                FetchState.PARSE_ERROR->{
+                    "HTTP 오류입니다."
                 }
-                "3err" ->{
-                    Log.e("TAG", "err3333", )
+                FetchState.WRONG_CONNECTION->{
+                    "호스트 오류입니다."
                 }
-                "4err" ->{
-                    Log.e("TAG", "err4444", )
+                else->{
+                    "통신 실패 ${it.first.message}"
                 }
-
             }
         }
     }
